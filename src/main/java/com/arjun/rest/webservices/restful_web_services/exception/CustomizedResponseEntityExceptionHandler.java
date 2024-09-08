@@ -18,6 +18,8 @@ import com.arjun.rest.webservices.restful_web_services.user.UserNotFoundExceptio
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(Exception.class)  //this handles all kind of exceptions
+	// ResponseEntity is the function that handles all exceptions defined in springboot under class ResponseEntityExceptionHandler
+	
 	public final ResponseEntity<ErrorDetails> handleAllExceptions(Exception ex, WebRequest request) throws Exception {
 		
 		//We created an object of ErrorDetails using constructor
