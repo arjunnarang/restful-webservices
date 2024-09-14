@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class UserResource {
 
@@ -48,7 +50,7 @@ public class UserResource {
 	
 	//Creating new user, 
 	@PostMapping("/users")
-	public ResponseEntity<User> createuser(@RequestBody User user) {
+	public ResponseEntity<User> createuser(@Valid @RequestBody User user) {
 		User savedUser = service.save(user);
 		
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest()  //this will return the current request that is /users
