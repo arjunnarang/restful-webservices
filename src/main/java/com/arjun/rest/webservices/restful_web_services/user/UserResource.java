@@ -5,6 +5,8 @@ package com.arjun.rest.webservices.restful_web_services.user;
 import java.net.URI;
 import java.util.List;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import jakarta.validation.Valid;
 
@@ -32,14 +35,39 @@ public class UserResource {
 	}
 	
 	@GetMapping(path = "/users/{id}")
-	public User retrieveById(@PathVariable Integer id){
+	//Adding entitymodel here so as to implement hateoas means adding links to other URLs in JSON responses 
+	// When this url is hit http://localhost:8080/users/1
+	//{
+//	"id": 1,
+//	"name": "Adam",
+//	"birthdate": "1994-09-21",
+//	"_links":{
+//	"all-users":{
+//	"href": "http://localhost:8080/users"
+//	}
+//	}
+//	}
+	
+//	We get the above response returned. As we can see the we can directly go to all users link by clicking on href link
+//	mentioned in above response
+	public EntityModel<User> retrieveById(@PathVariable Integer id){
 		User user = service.findOne(id);
 		
 		if(user == null) {
 			throw new UserNotFoundException("id:" + id);
 		}
 		
-		return user;
+		EntityModel<User> entityModel = EntityModel.of(user);
+		
+		//this creates a route or link to retrieve all users using WebMvcLinkBuilder
+		WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).retrieveAll());
+		
+		//Adding above created link to entity model
+		//"all-users" will be key and the link will be value in JSON response returned
+		entityModel.add(link.withRel("all-users"));
+		
+		//returning entity model
+		return entityModel;
 	}
 	
 	@DeleteMapping(path = "/users/{id}")
