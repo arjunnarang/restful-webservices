@@ -1,0 +1,10 @@
+
+We have @GeneratedValue on id field in both User.java and Post.java files so following sequence queries are formed
+
+Hibernate: create sequence post_seq start with 1 increment by 50
+Hibernate: create sequence user_details_seq start with 1 increment by 50
+Hibernate: create table post (id integer not null, user_id integer, description varchar(255), primary key (id))
+Hibernate: create table user_details (birthdate date, id integer not null, name varchar(255), primary key (id))
+
+In Table post "user_id" this column is created as in User.java we have a relationship of OneToMany and "user" object
+is the owner of that relationship

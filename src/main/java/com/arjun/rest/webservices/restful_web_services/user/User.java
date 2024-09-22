@@ -3,12 +3,15 @@
 package com.arjun.rest.webservices.restful_web_services.user;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
@@ -22,6 +25,10 @@ public class User {
 	@Id
 	@GeneratedValue
 	private Integer id;
+	
+	@OneToMany(mappedBy="user")  //user is the object created in Post.java
+	@JsonIgnore
+	private List<Post> posts;
 	
 	@Size(min=2, message="Name should have atleast 2 characters")
 	@JsonProperty("user_name")
