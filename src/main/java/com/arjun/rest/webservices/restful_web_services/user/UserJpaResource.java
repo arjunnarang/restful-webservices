@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.arjun.rest.webservices.restful_web_services.jpa.PostRepository;
 import com.arjun.rest.webservices.restful_web_services.jpa.UserRepository;
 
 import jakarta.validation.Valid;
@@ -30,8 +31,11 @@ public class UserJpaResource {
 	//Using constructor injection as UserDaoService is handled by spring as all the business logic is written there	
 	private UserRepository repository;
 	
-	public UserJpaResource(UserRepository repository) {
+	private PostRepository postRepository;
+	
+	public UserJpaResource(UserRepository repository, PostRepository postRepository) {
 		this.repository = repository;
+		this.postRepository = postRepository;
 	}
 	
 	@GetMapping("/jpa/users")
@@ -104,6 +108,7 @@ public class UserJpaResource {
 	}
 	
 	
+	
 	//Creating new user, 
 	@PostMapping("/jpa/users")
 	public ResponseEntity<User> createuser(@Valid @RequestBody User user) {
@@ -116,5 +121,67 @@ public class UserJpaResource {
 		
 		//return http response status 201 which stands for created and location created above to fetch the currently created user as a response
 		return ResponseEntity.created(location).build();
+	}
+	
+	
+	//Function to create posts for a specific user
+	@PostMapping(path = "/jpa/users/{id}/posts")
+	public ResponseEntity<Object> createPostForUser(@PathVariable int id, @Valid @RequestBody Post post){
+		
+		//first we found the user by id
+		Optional<User> user = repository.findById(id);
+		
+		if(user.isEmpty()) {
+			throw new UserNotFoundException("id:" + id);
+		}
+		
+		//We set the user in User type variable in Post so that post is connected with the user
+		post.setUser(user.get());
+		
+		//then we add the post into the list
+		Post savedPost = postRepository.save(post);
+		
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest()  //this will return the current request that is /posts
+				  								  .path("/{id}")         //this will append the id of the newly created post on to current requests
+				  								  .buildAndExpand(savedPost.getId())  //this will get the value of the created or savedPost and place in the /users/{id}
+				  								  .toUri();  //this will compile the location url as localhost:8080/jpa/users/${id}/posts/1
+
+			//return http response status 201 which stands for created and location created above to fetch the currently created user as a response
+			return ResponseEntity.created(location).build();
+		
+	}
+	
+	
+	@GetMapping(path = "/jpa/users/{id}/posts/{postId}")
+	//Adding entitymodel here so as to implement hateoas means adding links to other URLs in JSON responses 
+//	{
+//		"description": "I want to learn Java",
+//		"_links":{
+//		"all-posts":{
+//		"href": "http://localhost:8080/jpa/users/1001/posts"
+//		}
+//		}
+//		}
+	
+//	 We can see the we can directly go to all posts link by clicking on href link
+//	mentioned in above response
+	public EntityModel<Post> retrievePostById(@PathVariable Integer id, @PathVariable Integer postId){
+		Optional<Post> post = postRepository.findById(postId);
+		
+		if(post.isEmpty()) {
+			throw new PostNotFoundException("id:" + postId);
+		}
+		
+		EntityModel<Post> entityModel = EntityModel.of(post.get());
+		
+		//this creates a route or link to retrieve all posts using WebMvcLinkBuilder
+		WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).retrievePostsForUser(id));
+		
+		//Adding above created link to entity model
+		//"all-posts" will be key and the link will be value in JSON response returned
+		entityModel.add(link.withRel("all-posts"));
+		
+		//returning entity model
+		return entityModel;
 	}
 }

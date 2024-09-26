@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.arjun.rest.webservices.restful_web_services.user.PostNotFoundException;
 import com.arjun.rest.webservices.restful_web_services.user.UserNotFoundException;
 
 
@@ -47,6 +48,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 	
+	
 	@Override  //as this method in ResponseEntityClass is not final, we can override it
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -58,5 +60,16 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 		//ex.getFieldError().getDefaultMessage() - return only the first error
 		
 		return new ResponseEntity(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+	
+	
+	@ExceptionHandler(PostNotFoundException.class)  //this handles Post not found exception
+	public final ResponseEntity<ErrorDetails> handlePostNotFoundException(Exception ex, WebRequest request) throws Exception{
+		
+		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+		
+		
+		return new ResponseEntity<ErrorDetails> (errorDetails, HttpStatus.NOT_FOUND);
+		
 	}
 }
