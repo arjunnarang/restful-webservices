@@ -28,7 +28,7 @@ public class User {
 	
 	@OneToMany(mappedBy="user")  //user is the object created in Post.java
 	@JsonIgnore
-	private List<Post> posts;
+	private List<Post> posts;   //a list of type "Post" is created
 	
 	@Size(min=2, message="Name should have atleast 2 characters")
 	@JsonProperty("user_name")
@@ -67,6 +67,16 @@ public class User {
 
 	public void setBirthdate(LocalDate birthdate) {
 		this.birthdate = birthdate;
+	}
+
+	
+
+	public List<Post> getPosts() {
+		return posts;
+	}
+
+	public void setPosts(List<Post> posts) {
+		this.posts = posts;
 	}
 
 	@Override

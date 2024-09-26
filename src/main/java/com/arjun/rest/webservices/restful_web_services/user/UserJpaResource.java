@@ -83,6 +83,27 @@ public class UserJpaResource {
 	}
 	
 	
+	
+	//Fetching all posts for a particular user
+	
+	@GetMapping(path = "/jpa/users/{id}/posts")
+	public List<Post> retrievePostsForUser(@PathVariable int id){
+		
+		//first we found the user by id
+		Optional<User> user = repository.findById(id);
+		
+		if(user.isEmpty()) {
+			throw new UserNotFoundException("id:" + id);
+		}
+		
+		
+		//now we have a user stored in the "user" object and now through JPA we retrieved posts linked with 
+		//current user id. Spring boot would automatically fetch posts of that particular user because a user_id column is created in the post table
+		//because in User.java we have mentioned "user" as the relationship owner between User and Post
+		return user.get().getPosts();
+	}
+	
+	
 	//Creating new user, 
 	@PostMapping("/jpa/users")
 	public ResponseEntity<User> createuser(@Valid @RequestBody User user) {
