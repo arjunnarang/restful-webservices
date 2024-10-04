@@ -8,3 +8,22 @@ Hibernate: create table user_details (birthdate date, id integer not null, name 
 
 In Table post "user_id" this column is created as in User.java we have a relationship of OneToMany and "user" object
 is the owner of that relationship
+
+
+
+docker run --detach --env MYSQL_ROOT_PASSWORD=dummypassword --env MYSQL_USER=social-media-user --env MYSQL_PASSWORD=dummypassword --env MYSQL_DATABASE=social-media-database --name mysocialmediasql --publish 3306:3306 mysql:8-oracle
+
+docker run --detach 
+--env MYSQL_ROOT_PASSWORD=dummypassword -> Sql rootpassword
+--env MYSQL_USER=social-media-user -> Sql username
+--env MYSQL_PASSWORD=dummypassword  -> Sql Password
+--env MYSQL_DATABASE=social-media-database -> Name of the database
+--name mysocialmediasql -> Name of the container
+--publish 3306:3306 mysql:8-oracle -> This is image of sql
+
+After running above commands, docker container would get created. Open docker and start the docker container.
+Then go to git bash and type 'mysqlsh' to connect to sql database.
+
+run command '\use <schema/table_name>'
+
+run your sql queries
